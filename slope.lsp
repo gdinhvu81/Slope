@@ -4,7 +4,7 @@
 ; IT WILL AUTOMATICALLY CALCULATE THE SLOPE FOR THE USER
 ; AND SHOW IT ON THE COMMAND LINE
 
-;Load VLisp extensions
+;LOAD VLISP EXTENSIONS
 (vl-load-com) 
 
 (defun c:Slope()
@@ -34,40 +34,40 @@
   ; ALGORITHM TO DETERMINE SLOPE PERCENTAGE AND PRINT IT TO SCREEN
   (setq slope (LM:roundto (* 100 (/ totalElevation d)) 1))
   
-  ; sets dimension precision to get rid of ending 0's
+  ; SETS DIMENSION PRECISION TO GET RID OF ENDING 0'S
   ;(setvar 'dimzin 12)
   
-  ; Converts real number to string in order to print it to the block
+  ; CONVERTS REAL NUMBER TO STRING IN ORDER TO PRINT IT TO THE BLOCK
   (setq slopes (rtos slope))
   (princ slope)
   (princ "%")
   (princ "\n")
  
   ; INSERTS SLOPE BLOCK INTO DRAWING WITH CORRECT LAYER 
-  	; Sets dimension precision back to 0
-	(setvar 'dimzin 0)
+  ; Sets dimension precision back to 0
+  (setvar 'dimzin 0)
 	
-	(insBlock)
+  ; CALLS THE INSERT BLOCK METHOD
+  (insBlock)
 	
-
-  
+ 
   (princ)
 ); END OF SLOPE FUNCTION
 
 ;; ============================================================================================================================================
 
-; Rounds slope to 1 decimal
+; ROUNDS SLOPE TO 1 DECIMAL
 
 ;; ============================================================================================================================================
-;; Round Multiple  -  Lee Mac
-;; Rounds 'n' to the nearest multiple of 'm'
+;; ROUND MULTIPLE  -  LEE MAC
+;; ROUNDS 'N' TO THE NEAREST MULTIPLE OF 'M'
 
 (defun LM:roundm ( n m )
     (* m (fix ((if (minusp n) - +) (/ n (float m)) 0.5)))
 )
 
-;; Round  -  Lee Mac
-;; Rounds 'n' to the nearest integer
+;; ROUND  -  LEE MAC
+;; ROUNDS 'N' TO THE NEAREST INTEGER
 
 (defun LM:roundto ( n p )
     (LM:roundm n (expt 10.0 (- p)))
@@ -75,38 +75,39 @@
 
 ;; ============================================================================================================================================
 
-; Insert Block Method and Change to specified slope
+; INSERT BLOCK METHOD AND CHANGE TO SPECIFIED SLOPE
 
 ;; ============================================================================================================================================
 
 (defun insBlock ()
-	(command "INSERT" "AZ-SLOPE" pause "" "" "")
+	(command "INSERT" "AZ-SLOPE" pause 0.8 "" "")
+	(command "_.-Layer" "_m" "H - SPOTS" "_Color" "1" "" "")
 	(command "CHPROP" "last" "" "LA" "H - SPOTS" "")
 	
-	  ; if select all blocks with attributes and named 'AZ-SLOPE'
+	  ; IF SELECT ALL BLOCKS WITH ATTRIBUTES AND NAMED 'AZ-SLOPE'
   (if (setq s1 (ssget "L" '((0 . "INSERT") (2 . "AZ-SLOPE") (66 . 1))))
-    ; set the index variable 'i' with the selection set length,
-    ; and repeat the number of previous selected blocks
+    ; SET THE INDEX VARIABLE 'I' WITH THE SELECTION SET LENGTH,
+    ; AND REPEAT THE NUMBER OF PREVIOUS SELECTED BLOCKS
     (repeat (setq i (sslength s1))
-      ; get the 'i' ename from the selection set,
-      ; sets the variable 'i' reduced by 1 in each loop
-      ; and transform the entity to a VLA-object
+      ; GET THE 'I' ENAME FROM THE SELECTION SET,
+      ; SETS THE VARIABLE 'I' REDUCED BY 1 IN EACH LOOP
+      ; AND TRANSFORM THE ENTITY TO A VLA-OBJECT
       (setq obj    (vlax-ename->vla-object (ssname s1 (setq i (1- i))))
-            ; sets the 'attlst' variable to nil, to ensure that in
-            ; the next loop, is setted with the correct attributes only
+            ; SETS THE 'ATTLST' VARIABLE TO NIL, TO ENSURE THAT IN
+            ; THE NEXT LOOP, IS SETTED WITH THE CORRECT ATTRIBUTES ONLY
             attlst nil
-            ; sets the 'attlst' variable with the attributes
-            ; in the obj block, as a list with VLA-objects
+            ; SETS THE 'ATTLST' VARIABLE WITH THE ATTRIBUTES
+            ; IN THE OBJ BLOCK, AS A LIST WITH VLA-OBJECTS
             attlst (vlax-invoke obj 'GetAttributes)
       )
-      ; step thru all attributes from the list
+      ; STEP THRU ALL ATTRIBUTES FROM THE LIST
       (foreach att attlst
-        ; test if TAG is "DESCRIPTION_*"
+        ; TEST IF TAG IS "DESCRIPTION_*"
         (if (and (wcmatch (strcase (vla-get-TagString att)) "SLOPE")
-                 ; and, test if can be modified
+                 ; AND, TEST IF CAN BE MODIFIED
                  (vlax-write-enabled-p att)
             )
-          ; if true, put an empty string
+          ; IF TRUE, PUT AN EMPTY STRING
           (vla-put-TextString att (strcat slopes "%"))		  
         )
       )
@@ -116,27 +117,27 @@
 
 ;; ============================================================================================================================================
 
-; Get and Set Attribute Values 
+; GET AND SET ATTRIBUTE VALUES 
 
 ;; ============================================================================================================================================
 
-;; Get Attribute Value  -  Lee Mac
-;; Returns the value held by the specified tag within the supplied block, if present.
-;; blk - [vla] VLA Block Reference Object
-;; tag - [str] Attribute TagString
-;; Returns: [str] Attribute value, else nil if tag is not found.
+;; GET ATTRIBUTE VALUE  -  LEE MAC
+;; RETURNS THE VALUE HELD BY THE SPECIFIED TAG WITHIN THE SUPPLIED BLOCK, IF PRESENT.
+;; BLK - [VLA] VLA BLOCK REFERENCE OBJECT
+;; TAG - [STR] ATTRIBUTE TAGSTRING
+;; RETURNS: [STR] ATTRIBUTE VALUE, ELSE NIL IF TAG IS NOT FOUND.
 
 (defun LM:vl-getattributevalue ( blk tag )
     (setq tag (strcase tag))
     (vl-some '(lambda ( att ) (if (= tag (strcase (vla-get-tagstring att))) (vla-get-textstring att))) (vlax-invoke blk 'getattributes))
 )
 
-;; Set Attribute Value  -  Lee Mac
-;; Sets the value of the first attribute with the given tag found within the block, if present.
-;; blk - [vla] VLA Block Reference Object
-;; tag - [str] Attribute TagString
-;; val - [str] Attribute Value
-;; Returns: [str] Attribute value if successful, else nil.
+;; SET ATTRIBUTE VALUE  -  LEE MAC
+;; SETS THE VALUE OF THE FIRST ATTRIBUTE WITH THE GIVEN TAG FOUND WITHIN THE BLOCK, IF PRESENT.
+;; BLK - [VLA] VLA BLOCK REFERENCE OBJECT
+;; TAG - [STR] ATTRIBUTE TAGSTRING
+;; VAL - [STR] ATTRIBUTE VALUE
+;; RETURNS: [STR] ATTRIBUTE VALUE IF SUCCESSFUL, ELSE NIL.
 
 (defun LM:vl-setattributevalue ( blk tag val )
     (setq tag (strcase tag))
@@ -150,20 +151,20 @@
     )
 )
 
-;; Get Attribute Values  -  Lee Mac
-;; Returns an association list of attributes present in the supplied block.
-;; blk - [vla] VLA Block Reference Object
-;; Returns: [lst] Association list of ((<tag> . <value>) ... )
+;; GET ATTRIBUTE VALUES  -  LEE MAC
+;; RETURNS AN ASSOCIATION LIST OF ATTRIBUTES PRESENT IN THE SUPPLIED BLOCK.
+;; BLK - [VLA] VLA BLOCK REFERENCE OBJECT
+;; RETURNS: [LST] ASSOCIATION LIST OF ((<TAG> . <VALUE>) ... )
 
 (defun LM:vl-getattributevalues ( blk )
     (mapcar '(lambda ( att ) (cons (vla-get-tagstring att) (vla-get-textstring att))) (vlax-invoke blk 'getattributes))
 )
 
-;; Set Attribute Values  -  Lee Mac
-;; Sets attributes with tags found in the association list to their associated values.
-;; blk - [vla] VLA Block Reference Object
-;; lst - [lst] Association list of ((<tag> . <value>) ... )
-;; Returns: nil
+;; SET ATTRIBUTE VALUES  -  LEE MAC
+;; SETS ATTRIBUTES WITH TAGS FOUND IN THE ASSOCIATION LIST TO THEIR ASSOCIATED VALUES.
+;; BLK - [VLA] VLA BLOCK REFERENCE OBJECT
+;; LST - [LST] ASSOCIATION LIST OF ((<TAG> . <VALUE>) ... )
+;; RETURNS: NIL
 
 (defun LM:vl-setattributevalues ( blk lst / itm )
     (foreach att (vlax-invoke blk 'getattributes)
@@ -173,11 +174,11 @@
     )
 )
 
-;; Get Attribute Value  -  Lee Mac
-;; Returns the value held by the specified tag within the supplied block, if present.
-;; blk - [ent] Block (Insert) Entity Name
-;; tag - [str] Attribute TagString
-;; Returns: [str] Attribute value, else nil if tag is not found.
+;; GET ATTRIBUTE VALUE  -  LEE MAC
+;; RETURNS THE VALUE HELD BY THE SPECIFIED TAG WITHIN THE SUPPLIED BLOCK, IF PRESENT.
+;; BLK - [ENT] BLOCK (INSERT) ENTITY NAME
+;; TAG - [STR] ATTRIBUTE TAGSTRING
+;; RETURNS: [STR] ATTRIBUTE VALUE, ELSE NIL IF TAG IS NOT FOUND.
 
 (defun LM:getattributevalue ( blk tag / enx )
     (if (and (setq blk (entnext blk)) (= "ATTRIB" (cdr (assoc 0 (setq enx (entget blk))))))
@@ -188,11 +189,11 @@
     )
 )
 
-;; Get Attribute Value  -  Lee Mac
-;; Returns the value held by the specified tag within the supplied block, if present.
-;; blk - [ent] Block (Insert) Entity Name
-;; tag - [str] Attribute TagString
-;; Returns: [str] Attribute value, else nil if tag is not found.
+;; GET ATTRIBUTE VALUE  -  LEE MAC
+;; RETURNS THE VALUE HELD BY THE SPECIFIED TAG WITHIN THE SUPPLIED BLOCK, IF PRESENT.
+;; BLK - [ENT] BLOCK (INSERT) ENTITY NAME
+;; TAG - [STR] ATTRIBUTE TAGSTRING
+;; RETURNS: [STR] ATTRIBUTE VALUE, ELSE NIL IF TAG IS NOT FOUND.
 
 (defun LM:getattributevalue ( blk tag / val enx )
     (while
@@ -207,12 +208,12 @@
     )
 )
 
-;; Set Attribute Value  -  Lee Mac
-;; Sets the value of the first attribute with the given tag found within the block, if present.
-;; blk - [ent] Block (Insert) Entity Name
-;; tag - [str] Attribute TagString
-;; val - [str] Attribute Value
-;; Returns: [str] Attribute value if successful, else nil
+;; SET ATTRIBUTE VALUE  -  LEE MAC
+;; SETS THE VALUE OF THE FIRST ATTRIBUTE WITH THE GIVEN TAG FOUND WITHIN THE BLOCK, IF PRESENT.
+;; BLK - [ENT] BLOCK (INSERT) ENTITY NAME
+;; TAG - [STR] ATTRIBUTE TAGSTRING
+;; VAL - [STR] ATTRIBUTE VALUE
+;; RETURNS: [STR] ATTRIBUTE VALUE IF SUCCESSFUL, ELSE NIL
 
 (defun LM:setattributevalue ( blk tag val / enx )
     (if (and (setq blk (entnext blk)) (= "ATTRIB" (cdr (assoc 0 (setq enx (entget blk))))))
@@ -228,12 +229,12 @@
     )
 )
 
-;; Set Attribute Value  -  Lee Mac
-;; Sets the value of the first attribute with the given tag found within the block, if present.
-;; blk - [ent] Block (Insert) Entity Name
-;; tag - [str] Attribute TagString
-;; val - [str] Attribute Value
-;; Returns: [str] Attribute value if successful, else nil.
+;; SET ATTRIBUTE VALUE  -  LEE MAC
+;; SETS THE VALUE OF THE FIRST ATTRIBUTE WITH THE GIVEN TAG FOUND WITHIN THE BLOCK, IF PRESENT.
+;; BLK - [ENT] BLOCK (INSERT) ENTITY NAME
+;; TAG - [STR] ATTRIBUTE TAGSTRING
+;; VAL - [STR] ATTRIBUTE VALUE
+;; RETURNS: [STR] ATTRIBUTE VALUE IF SUCCESSFUL, ELSE NIL.
 
 (defun LM:setattributevalue ( blk tag val / end enx )
     (while
@@ -253,10 +254,10 @@
     )
 )
 
-;; Get Attribute Values  -  Lee Mac
-;; Returns an association list of attributes present in the supplied block.
-;; blk - [ent] Block (Insert) Entity Name
-;; Returns: [lst] Association list of ((<tag> . <value>) ... )
+;; GET ATTRIBUTE VALUES  -  LEE MAC
+;; RETURNS AN ASSOCIATION LIST OF ATTRIBUTES PRESENT IN THE SUPPLIED BLOCK.
+;; BLK - [ENT] BLOCK (INSERT) ENTITY NAME
+;; RETURNS: [LST] ASSOCIATION LIST OF ((<TAG> . <VALUE>) ... )
 
 (defun LM:getattributevalues ( blk / enx )
     (if (and (setq blk (entnext blk)) (= "ATTRIB" (cdr (assoc 0 (setq enx (entget blk))))))
@@ -270,10 +271,10 @@
     )
 )
 
-;; Get Attribute Values  -  Lee Mac
-;; Returns an association list of attributes present in the supplied block.
-;; blk - [ent] Block (Insert) Entity Name
-;; Returns: [lst] Association list of ((<tag> . <value>) ... )
+;; GET ATTRIBUTE VALUES  -  LEE MAC
+;; RETURNS AN ASSOCIATION LIST OF ATTRIBUTES PRESENT IN THE SUPPLIED BLOCK.
+;; BLK - [ENT] BLOCK (INSERT) ENTITY NAME
+;; RETURNS: [LST] ASSOCIATION LIST OF ((<TAG> . <VALUE>) ... )
 
 (defun LM:getattributevalues ( blk / enx lst )
     (while (and (setq blk (entnext blk)) (= "ATTRIB" (cdr (assoc 0 (setq enx (entget blk))))))
@@ -290,11 +291,11 @@
     (reverse lst)
 )
 
-;; Set Attribute Values  -  Lee Mac
-;; Sets attributes with tags found in the association list to their associated values.
-;; blk - [ent] Block (Insert) Entity Name
-;; lst - [lst] Association list of ((<tag> . <value>) ... )
-;; Returns: nil
+;; SET ATTRIBUTE VALUES  -  LEE MAC
+;; SETS ATTRIBUTES WITH TAGS FOUND IN THE ASSOCIATION LIST TO THEIR ASSOCIATED VALUES.
+;; BLK - [ENT] BLOCK (INSERT) ENTITY NAME
+;; LST - [LST] ASSOCIATION LIST OF ((<TAG> . <VALUE>) ... )
+;; RETURNS: NIL
 
 (defun LM:setattributevalues ( blk lst / enx itm )
     (if (and (setq blk (entnext blk)) (= "ATTRIB" (cdr (assoc 0 (setq enx (entget blk))))))
@@ -310,11 +311,11 @@
     )
 )
 
-;; Set Attribute Values  -  Lee Mac
-;; Sets attributes with tags found in the association list to their associated values.
-;; blk - [ent] Block (Insert) Entity Name
-;; lst - [lst] Association list of ((<tag> . <value>) ... )
-;; Returns: nil
+;; SET ATTRIBUTE VALUES  -  LEE MAC
+;; SETS ATTRIBUTES WITH TAGS FOUND IN THE ASSOCIATION LIST TO THEIR ASSOCIATED VALUES.
+;; BLK - [ENT] BLOCK (INSERT) ENTITY NAME
+;; LST - [LST] ASSOCIATION LIST OF ((<TAG> . <VALUE>) ... )
+;; RETURNS: NIL
 
 (defun LM:setattributevalues ( blk lst / enx itm )
     (while (and (setq blk (entnext blk)) (= "ATTRIB" (cdr (assoc 0 (setq enx (entget blk))))))

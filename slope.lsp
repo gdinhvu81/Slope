@@ -15,7 +15,25 @@
 
 (defun c:Slope()
   (terpri)
+  
+  ; SETS DIMENSION PRECISION TO GET RID OF ENDING 0'S
+  ;(setvar 'dimzin 12)
 
+  ; Sets dimension precision back to 0
+  (setvar 'dimzin 0) 
+  ; CALLS THE INSERT BLOCK METHOD TO INSERT BLOCK WITH CORRECT LAYER
+  (insBlock)
+ 
+  (princ)
+); END OF SLOPE FUNCTION
+
+;; ============================================================================================================================================
+
+; SLOPE METHOD THAT CALCULATES SLOPE 
+
+;; ============================================================================================================================================
+
+(defun calcSlope()
   ; GETS FIRST ELEVATION FROM USER.
   ; CAN'T BE NEGATIVE 
   (initget (+ 1 4))
@@ -40,32 +58,20 @@
   ; ALGORITHM TO DETERMINE SLOPE PERCENTAGE AND PRINT IT TO SCREEN
   (setq slope (LM:roundto (* 100 (/ totalElevation d)) 1))
   
-  ; SETS DIMENSION PRECISION TO GET RID OF ENDING 0'S
-  ;(setvar 'dimzin 12)
-  
   ; CONVERTS REAL NUMBER TO STRING IN ORDER TO PRINT IT TO THE BLOCK
-  (setq slopes (rtos slope))
-  (princ slope)
-  (princ "%")
-  (princ "\n")
- 
-  ; Sets dimension precision back to 0
-  (setvar 'dimzin 0)
-	
-  ; CALLS THE INSERT BLOCK METHOD TO INSERT BLOCK WITH CORRECT LAYER
-  (insBlock)
-	
- 
-  (princ)
-); END OF SLOPE FUNCTION
+  (setq slope (rtos slope))
+)
 
 ;; ============================================================================================================================================
 
 ; INSERT BLOCK METHOD AND CHANGE TO SPECIFIED SLOPE
 
 ;; ============================================================================================================================================
-
 (defun insBlock ()
+	(setq slopes (calcSlope))
+	(princ slopes)
+	(princ "%")
+	(princ "\n")
 	(command "INSERT" "AZ-SLOPE" pause 0.8 "" "")
 	(command "_.-Layer" "_m" "H - SPOTS" "_Color" "1" "" "")
 	(command "CHPROP" "last" "" "LA" "H - SPOTS" "")

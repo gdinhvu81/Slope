@@ -12,7 +12,6 @@
 ; MAIN METHOD FUNCTION SLOPE()
 
 ;; ============================================================================================================================================
-
 (defun c:Slope()
   (terpri)
   
@@ -33,7 +32,6 @@
 ; SLOPE METHOD THAT CALCULATES SLOPE 
 
 ;; ============================================================================================================================================
-
 (defun slope()
   ; GETS FIRST ELEVATION FROM USER.
   ; CAN'T BE NEGATIVE 
@@ -58,9 +56,6 @@
   
   ; ALGORITHM TO DETERMINE SLOPE PERCENTAGE AND PRINT IT TO SCREEN
   (setq slope (LM:roundto (* 100 (/ totalElevation d)) 1))
-  
-  ; CONVERTS REAL NUMBER TO STRING IN ORDER TO PRINT IT TO THE BLOCK
-
 )
 
 ;; ============================================================================================================================================
@@ -69,15 +64,19 @@
 
 ;; ============================================================================================================================================
 (defun insBlock ()
+	; CONVERTS REAL NUMBER TO STRING IN ORDER TO PRINT IT TO THE BLOCK
 	(setq slopes (rtos (slope)))
 	(princ "The Slope is: ")
 	(princ slopes)
 	(princ "%\n")
+	; INSERTS BLOCK AND PLACED WHERE USER WANTS WITH A SCALE OF 0.8
 	(command "INSERT" "AZ-SLOPE" pause 0.8 "" "")
+	; CREATES A LAYER H - SPOTS IF IT DOESN'T EXIST 
 	(command "_.-Layer" "_m" "H - SPOTS" "_Color" "1" "" "")
+	; CHANGES BLOCK TO H - SPOTS LAYER 
 	(command "CHPROP" "last" "" "LA" "H - SPOTS" "")
 	
-	  ; IF SELECT ALL BLOCKS WITH ATTRIBUTES AND NAMED 'AZ-SLOPE'
+  ; IF SELECT ALL BLOCKS WITH ATTRIBUTES AND NAMED 'AZ-SLOPE'
   (if (setq s1 (ssget "L" '((0 . "INSERT") (2 . "AZ-SLOPE") (66 . 1))))
     ; SET THE INDEX VARIABLE 'I' WITH THE SELECTION SET LENGTH,
     ; AND REPEAT THE NUMBER OF PREVIOUS SELECTED BLOCKS
@@ -115,14 +114,12 @@
 ;; ============================================================================================================================================
 ;; ROUND MULTIPLE  -  LEE MAC
 ;; ROUNDS 'N' TO THE NEAREST MULTIPLE OF 'M'
-
 (defun LM:roundm ( n m )
     (* m (fix ((if (minusp n) - +) (/ n (float m)) 0.5)))
 )
 
 ;; ROUND  -  LEE MAC
 ;; ROUNDS 'N' TO THE NEAREST INTEGER
-
 (defun LM:roundto ( n p )
     (LM:roundm n (expt 10.0 (- p)))
 )

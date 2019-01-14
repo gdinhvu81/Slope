@@ -15,14 +15,12 @@
 
 (defun c:Slope()
   (terpri)
-  
-  ; SETS DIMENSION PRECISION TO GET RID OF ENDING 0'S
-  ;(setvar 'dimzin 12)
 
-  ; Sets dimension precision back to 0
-  (setvar 'dimzin 0) 
   ; CALLS THE INSERT BLOCK METHOD TO INSERT BLOCK WITH CORRECT LAYER
   (insBlock)
+  
+  ; SETS DIMENSION PRECISION BACK TO 0 SO DEFAULT DECIMALS WILL BE TO THE HUNDRETHS
+  (setvar 'dimzin 0)
  
   (princ)
 ); END OF SLOPE FUNCTION
@@ -34,11 +32,12 @@
 ;; ============================================================================================================================================
 
 (defun calcSlope()
+  ; SETS DIMENSION PRECISION TO GET RID OF ENDING 0'S TO SET DECIMAL TO THE TENTHS
+  (setvar 'dimzin 12)
   ; GETS FIRST ELEVATION FROM USER.
   ; CAN'T BE NEGATIVE 
   (initget (+ 1 4))
   (setq firstElevation (getreal "\nEnter First Elevation: "))
-
   ; GETS SECOND ELEVATION FROM USER.
   ; CAN'T BE NEGATIVE 
   (initget (+ 1 4))
@@ -54,12 +53,13 @@
   (setq d (distance startingPoint endingPoint))
 
   (terpri)
-  
+ 
   ; ALGORITHM TO DETERMINE SLOPE PERCENTAGE AND PRINT IT TO SCREEN
   (setq slope (LM:roundto (* 100 (/ totalElevation d)) 1))
-  
+
   ; CONVERTS REAL NUMBER TO STRING IN ORDER TO PRINT IT TO THE BLOCK
   (setq slope (rtos slope))
+  
 )
 
 ;; ============================================================================================================================================
@@ -113,19 +113,23 @@
 
 ;; ============================================================================================================================================
 
-; ROUNDS REAL NUMBERS TO CERTAIN DECIMAL POINT
+; ROUNDS REAL NUMBERS TO CERTAIN DECIMAL POINT AND INTEGER
 
 ;; ============================================================================================================================================
+;; Round  -  Lee Mac
+;; Rounds 'n' to the nearest integer
+(defun LM:round ( n )
+    (fix (+ n (if (minusp n) -0.5 0.5)))
+)
+
 ;; ROUND MULTIPLE  -  LEE MAC
 ;; ROUNDS 'N' TO THE NEAREST MULTIPLE OF 'M'
-
 (defun LM:roundm ( n m )
     (* m (fix ((if (minusp n) - +) (/ n (float m)) 0.5)))
 )
 
 ;; ROUND  -  LEE MAC
 ;; ROUNDS 'N' TO THE NEAREST INTEGER
-
 (defun LM:roundto ( n p )
     (LM:roundm n (expt 10.0 (- p)))
 )

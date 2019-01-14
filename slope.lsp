@@ -18,9 +18,6 @@
 
   ; CALLS THE INSERT BLOCK METHOD TO INSERT BLOCK WITH CORRECT LAYER
   (insBlock)
-  
-  ; SETS DIMENSION PRECISION BACK TO 0 SO DEFAULT DECIMALS WILL BE TO THE HUNDRETHS
-  (setvar 'dimzin 0)
  
   (princ)
 ); END OF SLOPE FUNCTION
@@ -32,8 +29,6 @@
 ;; ============================================================================================================================================
 
 (defun calcSlope()
-  ; SETS DIMENSION PRECISION TO GET RID OF ENDING 0'S TO SET DECIMAL TO THE TENTHS
-  (setvar 'dimzin 12)
   ; GETS FIRST ELEVATION FROM USER.
   ; CAN'T BE NEGATIVE 
   (initget (+ 1 4))
@@ -51,15 +46,17 @@
   (setq startingPoint (getpoint "\nPick Starting Point:"))
   (setq endingPoint (getpoint "\nPick Ending Point:"))
   (setq d (distance startingPoint endingPoint))
-
-  (terpri)
  
   ; ALGORITHM TO DETERMINE SLOPE PERCENTAGE AND PRINT IT TO SCREEN
-  (setq slope (LM:roundto (* 100 (/ totalElevation d)) 1))
-
-  ; CONVERTS REAL NUMBER TO STRING IN ORDER TO PRINT IT TO THE BLOCK
-  (setq slope (rtos slope))
+  (setq slope (* 100 (/ totalElevation d)))
   
+  ; IF SLOPE % IS GREATER THAN OR EQUAL TO 10, ROUND SLOPE TO NEAREST WHOLE NUMBER
+  (if (>= slope 10)
+	(setq slope (rtos slope 2 0)))
+	
+  ; IF SLOPE IS LESS THAN 10, ROUND SLOPE TO NEAREST TENTH DECIMAL PLACE	
+  (setq slope (rtos slope 2 1))
+	  
 )
 
 ;; ============================================================================================================================================

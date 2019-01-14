@@ -69,14 +69,18 @@
 ;; ============================================================================================================================================
 (defun insBlock ()
 	(setq slopes (calcSlope))
-	(princ slopes)
-	(princ "%")
-	(princ "\n")
+	; INSERT 'AZ-SLOPE' BLOCK AND USER PLACES BLOCK WHERE THEY WANT. SCALE IS SET TO 0.8
 	(command "INSERT" "AZ-SLOPE" pause 0.8 "" "")
+	; CREATS NEW LAYER 'H - SPOTS' IF IT DOESN'T ALREADY EXISTS
 	(command "_.-Layer" "_m" "H - SPOTS" "_Color" "1" "" "")
+	; CHANGES LAYER OF 'AZ-SLOPE' TO 'H - SPOTS'
 	(command "CHPROP" "last" "" "LA" "H - SPOTS" "")
 	
-	  ; IF SELECT ALL BLOCKS WITH ATTRIBUTES AND NAMED 'AZ-SLOPE'
+	(princ "The Slope is: ")
+	(princ slopes)
+	(princ "%\n")
+	
+  ; IF SELECT ALL BLOCKS WITH ATTRIBUTES AND NAMED 'AZ-SLOPE'
   (if (setq s1 (ssget "L" '((0 . "INSERT") (2 . "AZ-SLOPE") (66 . 1))))
     ; SET THE INDEX VARIABLE 'I' WITH THE SELECTION SET LENGTH,
     ; AND REPEAT THE NUMBER OF PREVIOUS SELECTED BLOCKS

@@ -7,9 +7,34 @@
 ;LOAD VLISP EXTENSIONS
 (vl-load-com) 
 
+;; ============================================================================================================================================
+
+; MAIN METHOD FUNCTION SLOPE()
+
+;; ============================================================================================================================================
+
 (defun c:Slope()
   (terpri)
+  
+  ; SETS DIMENSION PRECISION TO GET RID OF ENDING 0'S
+  ;(setvar 'dimzin 12)
+ 
+  ; Sets dimension precision back to 0
+  ;(setvar 'dimzin 0)
+	
+  ; CALLS THE INSERT BLOCK METHOD TO INSERT BLOCK WITH CORRECT LAYER
+  (insBlock)
+ 
+  (princ)
+); END OF SLOPE FUNCTION
 
+;; ============================================================================================================================================
+
+; SLOPE METHOD THAT CALCULATES SLOPE 
+
+;; ============================================================================================================================================
+
+(defun slope()
   ; GETS FIRST ELEVATION FROM USER.
   ; CAN'T BE NEGATIVE 
   (initget (+ 1 4))
@@ -34,43 +59,8 @@
   ; ALGORITHM TO DETERMINE SLOPE PERCENTAGE AND PRINT IT TO SCREEN
   (setq slope (LM:roundto (* 100 (/ totalElevation d)) 1))
   
-  ; SETS DIMENSION PRECISION TO GET RID OF ENDING 0'S
-  ;(setvar 'dimzin 12)
-  
   ; CONVERTS REAL NUMBER TO STRING IN ORDER TO PRINT IT TO THE BLOCK
-  (setq slopes (rtos slope))
-  (princ slope)
-  (princ "%")
-  (princ "\n")
- 
-  ; INSERTS SLOPE BLOCK INTO DRAWING WITH CORRECT LAYER 
-  ; Sets dimension precision back to 0
-  (setvar 'dimzin 0)
-	
-  ; CALLS THE INSERT BLOCK METHOD
-  (insBlock)
-	
- 
-  (princ)
-); END OF SLOPE FUNCTION
 
-;; ============================================================================================================================================
-
-; ROUNDS SLOPE TO 1 DECIMAL
-
-;; ============================================================================================================================================
-;; ROUND MULTIPLE  -  LEE MAC
-;; ROUNDS 'N' TO THE NEAREST MULTIPLE OF 'M'
-
-(defun LM:roundm ( n m )
-    (* m (fix ((if (minusp n) - +) (/ n (float m)) 0.5)))
-)
-
-;; ROUND  -  LEE MAC
-;; ROUNDS 'N' TO THE NEAREST INTEGER
-
-(defun LM:roundto ( n p )
-    (LM:roundm n (expt 10.0 (- p)))
 )
 
 ;; ============================================================================================================================================
@@ -78,8 +68,11 @@
 ; INSERT BLOCK METHOD AND CHANGE TO SPECIFIED SLOPE
 
 ;; ============================================================================================================================================
-
 (defun insBlock ()
+	(setq slopes (rtos (slope)))
+	(princ "The Slope is: ")
+	(princ slopes)
+	(princ "%\n")
 	(command "INSERT" "AZ-SLOPE" pause 0.8 "" "")
 	(command "_.-Layer" "_m" "H - SPOTS" "_Color" "1" "" "")
 	(command "CHPROP" "last" "" "LA" "H - SPOTS" "")
@@ -113,6 +106,25 @@
       )
     )
   )
+)
+
+;; ============================================================================================================================================
+
+; ROUNDS REAL NUMBERS TO CERTAIN DECIMAL POINT
+
+;; ============================================================================================================================================
+;; ROUND MULTIPLE  -  LEE MAC
+;; ROUNDS 'N' TO THE NEAREST MULTIPLE OF 'M'
+
+(defun LM:roundm ( n m )
+    (* m (fix ((if (minusp n) - +) (/ n (float m)) 0.5)))
+)
+
+;; ROUND  -  LEE MAC
+;; ROUNDS 'N' TO THE NEAREST INTEGER
+
+(defun LM:roundto ( n p )
+    (LM:roundm n (expt 10.0 (- p)))
 )
 
 ;; ============================================================================================================================================

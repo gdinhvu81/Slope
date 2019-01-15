@@ -55,7 +55,7 @@
   
   ; IF SLOPE % IS GREATER THAN OR EQUAL TO 10, ROUND SLOPE TO NEAREST WHOLE NUMBER
   ; IF SLOPE % IS LESS THAN 10, ROUND SLOPE TO NEAREST TENTH
-  (if (>= slope 10)
+  (if (>= slope 9.9)
 	(setq slope (rtos slope 2 0))
 	(setq slope (rtos slope 2 1)))
 	  

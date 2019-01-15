@@ -1,8 +1,8 @@
 ; FUNCTION TO DETERMINE THE SLOPE OF GRADES.
-; ASKS USER TO INPUT FIRST ELEVATION AND SECOND ELEVATION
+; ASKS USER TO SELECT FIRST ELEVATION AND SECOND ELEVATION
 ; AND SELECT TWO POINTS FOR THE DISTANCE BETWEEN THE ELEVATIONS.
 ; IT WILL AUTOMATICALLY CALCULATE THE SLOPE FOR THE USER
-; AND SHOW IT ON THE COMMAND LINE
+; AND INSERT SLOPE BLOCK WITH APPROPRIATE SLOPE VALUE
 
 ;LOAD VLISP EXTENSIONS
 (vl-load-com) 
@@ -20,7 +20,7 @@
   (insBlock)
  
   (princ)
-); END OF SLOPE FUNCTION
+); END OF SLOPE() FUNCTION
 
 ;; ============================================================================================================================================
 
@@ -29,14 +29,17 @@
 ;; ============================================================================================================================================
 
 (defun calcSlope()
-  ; GETS FIRST ELEVATION FROM USER.
-  ; CAN'T BE NEGATIVE 
-  (initget (+ 1 4))
-  (setq firstElevation (getreal "\nEnter First Elevation: "))
-  ; GETS SECOND ELEVATION FROM USER.
-  ; CAN'T BE NEGATIVE 
-  (initget (+ 1 4))
-  (setq secondElevation (getreal "\nEnter Second Elevation: "))
+  ; ASKS USER TO SELECT THE FIRST ELEVATION AND STORES IT TO A VARIABLE
+  (setq elevationBlock1 (ssget ":S:E" '((0 . "INSERT") (2 . "AZ-SPOT") (66 . 1))))
+  (setq firstElevation (LM:GetAttributeValue (ssname elevationBlock1 0) "SPOT"))
+  (princ (strcat "\n[Attribute Value] : " firstElevation))
+  (setq firstElevation (atof firstElevation))
+  
+  ; ASKS USER TO SELECT THE SECOND ELEVATION AND STORES IT TO A VARIABLE
+  (setq elevationBlock2 (ssget ":S:E" '((0 . "INSERT") (2 . "AZ-SPOT") (66 . 1))))
+  (setq secondElevation (LM:GetAttributeValue (ssname elevationBlock2 0) "SPOT"))
+  (princ (strcat "\n[Attribute Value] : " secondElevation))
+  (setq secondElevation (atof secondElevation))
 
   ; SUBTRACTS FIRST ELEVATION FROM SECOND ELEVATION
   ; TAKES THE ABSOLUTE VALUE SO MAKE HIGH OR LOW IRRELEVANT
@@ -51,13 +54,12 @@
   (setq slope (* 100 (/ totalElevation d)))
   
   ; IF SLOPE % IS GREATER THAN OR EQUAL TO 10, ROUND SLOPE TO NEAREST WHOLE NUMBER
-  (if (>= slope 10)
+  ; IF SLOPE % IS LESS THAN 10, ROUND SLOPE TO NEAREST TENTH
+  (if (< slope 10)
+	(setq slope (rtos slope 2 1))
 	(setq slope (rtos slope 2 0)))
-	
-  ; IF SLOPE IS LESS THAN 10, ROUND SLOPE TO NEAREST TENTH DECIMAL PLACE	
-  (setq slope (rtos slope 2 1))
 	  
-)
+) ; END OF CALCSLOPE() METHOD
 
 ;; ============================================================================================================================================
 
@@ -106,7 +108,7 @@
       )
     )
   )
-)
+); END OF INSBLOCK() METHOD
 
 ;; ============================================================================================================================================
 

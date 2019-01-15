@@ -1,8 +1,8 @@
 ; FUNCTION TO DETERMINE THE SLOPE OF GRADES.
-; ASKS USER TO SELECT FIRST ELEVATION AND SECOND ELEVATION
+; ASKS USER TO INPUT FIRST ELEVATION AND SECOND ELEVATION
 ; AND SELECT TWO POINTS FOR THE DISTANCE BETWEEN THE ELEVATIONS.
 ; IT WILL AUTOMATICALLY CALCULATE THE SLOPE FOR THE USER
-; AND INSERT SLOPE BLOCK WITH APPROPRIATE SLOPE VALUE
+; AND SHOW IT ON THE COMMAND LINE
 
 ;LOAD VLISP EXTENSIONS
 (vl-load-com) 
@@ -29,13 +29,13 @@
 ;; ============================================================================================================================================
 
 (defun calcSlope()
-  ; ASKS USER TO SELECT THE FIRST ELEVATION AND STORES IT TO A VARIABLE
+  ; GETS FIRST ELEVATION FROM USER BY ASKING THEM TO SELECT ELEVATION BLOCK.
   (setq elevationBlock1 (ssget ":S:E" '((0 . "INSERT") (2 . "AZ-SPOT") (66 . 1))))
   (setq firstElevation (LM:GetAttributeValue (ssname elevationBlock1 0) "SPOT"))
   (princ (strcat "\n[Attribute Value] : " firstElevation))
   (setq firstElevation (atof firstElevation))
   
-  ; ASKS USER TO SELECT THE SECOND ELEVATION AND STORES IT TO A VARIABLE
+  ; GETS SECOND ELEVATION FROM USER ASKING THEM TO SELECT ELEVATION BLOCK.
   (setq elevationBlock2 (ssget ":S:E" '((0 . "INSERT") (2 . "AZ-SPOT") (66 . 1))))
   (setq secondElevation (LM:GetAttributeValue (ssname elevationBlock2 0) "SPOT"))
   (princ (strcat "\n[Attribute Value] : " secondElevation))
@@ -55,9 +55,9 @@
   
   ; IF SLOPE % IS GREATER THAN OR EQUAL TO 10, ROUND SLOPE TO NEAREST WHOLE NUMBER
   ; IF SLOPE % IS LESS THAN 10, ROUND SLOPE TO NEAREST TENTH
-  (if (< slope 10)
-	(setq slope (rtos slope 2 1))
-	(setq slope (rtos slope 2 0)))
+  (if (>= slope 10)
+	(setq slope (rtos slope 2 0))
+	(setq slope (rtos slope 2 1)))
 	  
 ) ; END OF CALCSLOPE() METHOD
 
@@ -69,7 +69,7 @@
 (defun insBlock ()
 	(setq slopes (calcSlope))
 	; INSERT 'AZ-SLOPE' BLOCK AND USER PLACES BLOCK WHERE THEY WANT. SCALE IS SET TO 0.8
-	(command "INSERT" "AZ-SLOPE" pause 0.8 "" "")
+	(command "_INSERT" "AZ-SLOPE-TEST" pause 1 "" "")
 	; CREATS NEW LAYER 'H - SPOTS' IF IT DOESN'T ALREADY EXISTS
 	(command "_.-Layer" "_m" "H - SPOTS" "_Color" "1" "" "")
 	; CHANGES LAYER OF 'AZ-SLOPE' TO 'H - SPOTS'
@@ -80,7 +80,7 @@
 	(princ "%\n")
 	
   ; IF SELECT ALL BLOCKS WITH ATTRIBUTES AND NAMED 'AZ-SLOPE'
-  (if (setq s1 (ssget "L" '((0 . "INSERT") (2 . "AZ-SLOPE") (66 . 1))))
+  (if (setq s1 (ssget "L" '((0 . "INSERT") (2 . "AZ-SLOPE-TEST") (66 . 1))))
     ; SET THE INDEX VARIABLE 'I' WITH THE SELECTION SET LENGTH,
     ; AND REPEAT THE NUMBER OF PREVIOUS SELECTED BLOCKS
     (repeat (setq i (sslength s1))
@@ -97,7 +97,7 @@
       )
       ; STEP THRU ALL ATTRIBUTES FROM THE LIST
       (foreach att attlst
-        ; TEST IF TAG IS "DESCRIPTION_*"
+        ; TEST IF TAG IS "SLOPE"
         (if (and (wcmatch (strcase (vla-get-TagString att)) "SLOPE")
                  ; AND, TEST IF CAN BE MODIFIED
                  (vlax-write-enabled-p att)

@@ -32,12 +32,25 @@
   ; GETS FIRST ELEVATION FROM USER BY ASKING THEM TO SELECT ELEVATION BLOCK.
   (setq elevationBlock1 (ssget ":S:E" '((0 . "INSERT") (2 . "AZ-SPOT") (66 . 1))))
   (setq firstElevation (LM:GetAttributeValue (ssname elevationBlock1 0) "SPOT"))
+  
+  ; CHECKS TO SEE IF FIRST ELEVATION IS AN ACTUAL NUMBER. IF NOT, ERROR MESSAGE WILL POP UP
+  (foreach n (vl-string->list firstElevation)
+		(if (alphachar-p n)
+			(err)))
+  
   (princ (strcat "\n[Attribute Value] : " firstElevation))
   (setq firstElevation (atof firstElevation))
+  
   
   ; GETS SECOND ELEVATION FROM USER ASKING THEM TO SELECT ELEVATION BLOCK.
   (setq elevationBlock2 (ssget ":S:E" '((0 . "INSERT") (2 . "AZ-SPOT") (66 . 1))))
   (setq secondElevation (LM:GetAttributeValue (ssname elevationBlock2 0) "SPOT"))
+  
+   ; CHECKS TO SEE IF SECOND ELEVATION IS AN ACTUAL NUMBER. IF NOT, ERROR MESSAGE WILL POP UP
+  (foreach n (vl-string->list secondElevation)
+		(if (alphachar-p n)
+			(err)))
+			
   (princ (strcat "\n[Attribute Value] : " secondElevation))
   (setq secondElevation (atof secondElevation))
 
@@ -109,6 +122,35 @@
     )
   )
 ); END OF INSBLOCK() METHOD
+
+;; ============================================================================================================================================
+
+; CREATES AN ERROR MESSAGE WHEN ELEVATION IS NOT VALID
+
+;; ============================================================================================================================================
+
+(defun err ( / *error* )
+  
+    (defun *error* ( msg )
+        (princ "Error: Elevation is not valid")
+		(princ "\n")
+        (princ msg)
+        (princ)
+    )
+    (getstring "\nElevation is not valid. Press ESC to cancel.")
+    (princ)
+)
+
+;; ============================================================================================================================================
+
+; CHECKS TO SEE IF ELEVATION IS ACTUALLY A NUMBER AND NOT HAVE LETTERS OR SYMBOLS IN IT
+
+;; ============================================================================================================================================
+; FUNCTION THAT CHECKS TO SEE IF STRING CONTAINS NUMBERS 0-9
+(defun _numericchar-p (n) (or(and (> n 47) (< n 58))(= n 46)))
+
+; FUNCTION THAT CHECKS TO SEE IF STRING DOES NOT CONTAIN 0-9 AND '.'
+(defun alphachar-p (n) (not (or (and (> n 47) (< n 58)) (= n 46))))
 
 ;; ============================================================================================================================================
 

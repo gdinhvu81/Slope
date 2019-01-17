@@ -132,7 +132,7 @@
 (defun err ( / *error* )
   
     (defun *error* ( msg )
-        (princ "Error: Elevation is not valid")
+        (princ "Error: Elevation is not valid number. Check if there are any letters or symbols.")
 		(princ "\n")
         (princ msg)
         (princ)
@@ -147,7 +147,7 @@
 
 ;; ============================================================================================================================================
 ; FUNCTION THAT CHECKS TO SEE IF STRING CONTAINS NUMBERS 0-9
-(defun _numericchar-p (n) (or(and (> n 47) (< n 58))(= n 46)))
+(defun numericchar-p (n) (or(and (> n 47) (< n 58))(= n 46)))
 
 ; FUNCTION THAT CHECKS TO SEE IF STRING DOES NOT CONTAIN 0-9 AND '.'
 (defun alphachar-p (n) (not (or (and (> n 47) (< n 58)) (= n 46))))

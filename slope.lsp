@@ -59,9 +59,7 @@
   (setq totalElevation (abs(- firstElevation secondElevation)))  
 
   ; GETS DISTANCE BETWEEN TWO POINTS
-  (setq startingPoint (getpoint "\nPick Starting Point:"))
-  (setq endingPoint (getpoint "\nPick Ending Point:"))
-  (setq d (distance startingPoint endingPoint))
+  (setq d (getdist "Pick distance"))
  
   ; ALGORITHM TO DETERMINE SLOPE PERCENTAGE AND PRINT IT TO SCREEN
   (setq slope (* 100 (/ totalElevation d)))

@@ -32,26 +32,11 @@
   ; GETS FIRST ELEVATION FROM USER BY ASKING THEM TO SELECT ELEVATION BLOCK.
   (setq elevationBlock1 (ssget ":S:E" '((0 . "INSERT") (2 . "AZ-SPOT") (66 . 1))))
   (setq firstElevation (LM:GetAttributeValue (ssname elevationBlock1 0) "SPOT"))
-  
-  ; CHECKS TO SEE IF FIRST ELEVATION IS AN ACTUAL NUMBER. IF NOT, ERROR MESSAGE WILL POP UP
-  (foreach n (vl-string->list firstElevation)
-		(if (alphachar-p n)
-			(err)))
-  
-  (princ (strcat "\n[Attribute Value] : " firstElevation))
   (setq firstElevation (atof firstElevation))
-  
   
   ; GETS SECOND ELEVATION FROM USER ASKING THEM TO SELECT ELEVATION BLOCK.
   (setq elevationBlock2 (ssget ":S:E" '((0 . "INSERT") (2 . "AZ-SPOT") (66 . 1))))
   (setq secondElevation (LM:GetAttributeValue (ssname elevationBlock2 0) "SPOT"))
-  
-   ; CHECKS TO SEE IF SECOND ELEVATION IS AN ACTUAL NUMBER. IF NOT, ERROR MESSAGE WILL POP UP
-  (foreach n (vl-string->list secondElevation)
-		(if (alphachar-p n)
-			(err)))
-			
-  (princ (strcat "\n[Attribute Value] : " secondElevation))
   (setq secondElevation (atof secondElevation))
 
   ; SUBTRACTS FIRST ELEVATION FROM SECOND ELEVATION
@@ -59,10 +44,10 @@
   (setq totalElevation (abs(- firstElevation secondElevation)))  
 
   ; GETS DISTANCE BETWEEN TWO POINTS
-  (setq d (getdist "Pick distance"))
+  (setq dist (getdist "Pick distance"))
  
   ; ALGORITHM TO DETERMINE SLOPE PERCENTAGE AND PRINT IT TO SCREEN
-  (setq slope (* 100 (/ totalElevation d)))
+  (setq slope (* 100 (/ totalElevation dist)))
   
   ; IF SLOPE % IS GREATER THAN OR EQUAL TO 10, ROUND SLOPE TO NEAREST WHOLE NUMBER
   ; IF SLOPE % IS LESS THAN 10, ROUND SLOPE TO NEAREST TENTH
@@ -135,7 +120,7 @@
         (princ msg)
         (princ)
     )
-    (getstring "\nElevation is not valid. Press ESC to cancel.")
+    (getstring "\nError: Elevation is not valid number. Check if there are any letters or symbols.")
     (princ)
 )
 
